@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">android-jmlink-demo</string>
+    <string name="app_name1">极光魔链</string>
+    <string name="app_desc">企业级深度链接服务，高效提升移动用户增长和活跃</string>
+    <string name="openScheme">一链直达</string>
+    <string name="replay">场景还原</string>
+    <string name="params">无码邀请</string>
+    <string name="models">丰富模板页</string>
+    <string name="schemeDescription">分享内容集成短链服务，用户点击可唤醒已安装的应用并跳转至目标页面</string>
+    <string name="chooseScenes">选择体验场景</string>
+    <string name="schemeScenesDesc">选择场景\n请下载魔链APP以便更好体验一链直达</string>
+    <string name="sceneAK">爱看视频</string>
+    <string name="schemeXS">小说阅读</string>
+    <string name="cancel">取消</string>
+    <string name="todo">TODO</string>
+</resources>
