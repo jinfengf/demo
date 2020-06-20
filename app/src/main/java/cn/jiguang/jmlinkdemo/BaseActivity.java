@@ -1,37 +1,86 @@
 package cn.jiguang.jmlinkdemo;
 
-import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
+import android.os.MessageQueue;
 import android.view.View;
-import android.view.Window;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class BaseActivity extends Activity {
+public class BaseActivity extends AppCompatActivity {
+    private LinearLayout root_layout;
+    private View statusBarView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initTitle();
+        if (Build.VERSION.SDK_INT >= 21) {
+            setStatusBarView();
+        }
     }
 
-    private void initTitle() {
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        //指定自定义标题栏的布局文件
-        setContentView(R.layout.titlebar);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-                R.layout.titlebar);
-//获取自定义标题栏的TextView控件并设置内容为传递过来的字符串
-        TextView textView = (TextView) findViewById(R.id.mytitle);
-        textView.setText("一链拉起");
-        //设置返回按钮的点击事件
-        ImageButton titleBackBtn = (ImageButton) findViewById(R.id.bt_back);
-        titleBackBtn.setOnClickListener(new View.OnClickListener() {
+
+    protected void initTitle(int toolbarId, String title, boolean rightBtn, int resId, View.OnClickListener clickListener) {
+        CustomToolbar ct = findViewById(toolbarId);
+        ct.setLeftTitleClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                //调用系统的返回按键的点击事件
-                finish();
+                BaseActivity.this.onBackPressed();
             }
         });
+        ct.setMainTitle(title);
+        if (rightBtn) {
+            ct.setRightTitleDrawable(resId);
+            ct.setRightTitleClickListener(clickListener);
+        }
+        setSupportActionBar(ct);
+    }
+
+
+    /**
+     * 设置状态栏（渐变）
+     * <p>
+     * https://www.jb51.net/article/124110.htm
+     * <p>
+     * https://blog.csdn.net/u010127332/article/details/81502950
+     */
+    private void setStatusBarView() {
+        //延时加载数据，保证Statusbar绘制完成后再findview。
+        Looper.myQueue().addIdleHandler(new MessageQueue.IdleHandler() {
+            @Override
+            public boolean queueIdle() {
+                initStatusBar();
+
+                //不加监听,也能实现改变statusbar颜色的效果。但是会出现问题：比如弹软键盘后,弹popwindow后,引起window状态改变时,statusbar的颜色就会复原.
+                getWindow().getDecorView().addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        initStatusBar();
+                        getWindow().getDecorView().removeOnLayoutChangeListener(this);
+                    }
+                });
+
+                //只走一次
+                return false;
+            }
+        });
+    }
+
+    /**
+     * 颜色渐变
+     */
+    private void initStatusBar() {
+        if (statusBarView == null) {
+            //利用反射机制修改状态栏背景
+            int identifier = getResources().getIdentifier("statusBarBackground", "id", "android");
+            statusBarView = getWindow().findViewById(identifier);
+        }
+
+        if (statusBarView != null) {
+            statusBarView.setBackgroundResource(R.drawable.shape_gradient);
+        }
     }
 }

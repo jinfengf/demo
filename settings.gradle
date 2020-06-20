@@ -1,2 +1,2 @@
-include ':app', 'shadow'
+include ':app', 'shadow', ':lib-ios-dialog'
 rootProject.name='android-jmlink-demo'
